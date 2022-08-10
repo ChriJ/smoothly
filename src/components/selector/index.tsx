@@ -43,7 +43,7 @@ export class Selector {
 
 	@Listen("keydown")
 	onKeyDown(event: KeyboardEvent) {
-		event.stopPropagation()
+		event.preventDefault()
 		if (this.opened) {
 			let direction: -1 | 0 | 1 = 0
 			switch (event.key) {
@@ -60,15 +60,9 @@ export class Selector {
 					this.filter = this.filter.slice(0, -1)
 					break
 				case "Enter":
-					this.items.forEach(element => {
-						if (!element.hidden) {
-							this.selected.emit(element.value)
-							if (this.mainElement && this.selectedElement)
-								this.mainElement.innerHTML = this.selectedElement.innerHTML
-							this.opened = false
-							this.filter = ""
-						}
-					})
+					this.selected.emit(this.selectedElement)
+					this.opened = false
+					this.filter = ""
 					break
 				default:
 					if (event.key.length == 1)
@@ -81,8 +75,7 @@ export class Selector {
 	}
 	private move(direction: -1 | 0 | 1): void {
 		if (direction) {
-			let selectedIndex = this.items.findIndex(item => item == this.selectedElement)
-			console.log("selectedindex", selectedIndex)
+			let selectedIndex = this.selectedElement ? this.items.findIndex(item => item == this.selectedElement) : 0
 			do {
 				selectedIndex = (selectedIndex + direction + this.items.length) % this.items.length
 			} while (this.items[selectedIndex].hidden)
